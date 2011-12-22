@@ -157,7 +157,7 @@ class StopSignal(kabuki.Hierarchical):
 
             if param.name == 'Tau_go':
                 # CHANGED 300->2
-                return pm.Uniform(param.full_name, lower=1, upper=20) #300)
+                return pm.Uniform(param.full_name, lower=1, upper=300)
 
             if param.name == 'Mu_stop':
                 return pm.Uniform(param.full_name, lower=1, upper=600)
@@ -166,7 +166,7 @@ class StopSignal(kabuki.Hierarchical):
                 return pm.Uniform(param.full_name, lower=1, upper=250)
 
             if param.name == 'Tau_stop':
-                return pm.Uniform(param.full_name, lower=1, upper=20) #250)
+                return pm.Uniform(param.full_name, lower=1, upper=250)
 
     def get_var_node(self, param):
         if param.name == 'Mu_go':
