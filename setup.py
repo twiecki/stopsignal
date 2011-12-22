@@ -23,7 +23,7 @@ setup(
     Matzke, D., Dolan, C.V, Logan, G.D., Brown, S.D., & Wagenmakers, E.-J. (2011). Bayesian parametric estimation of stop-signal reaction time distributions. Manuscript submitted for publication.""",
     install_requires=['NumPy >=1.3.0', 'kabuki >= 0.2a', 'pymc'],
     setup_requires=['NumPy >=1.3.0', 'kabuki >= 0.2a', 'pymc'],
-    include_dirs = [np.get_include()],
+    include_dirs = [np.get_include(), gsl_include],
     cmdclass = {'build_ext': build_ext},
     classifiers=[
                 'Development Status :: 3 - Alpha',
@@ -34,5 +34,5 @@ setup(
                 'Programming Language :: Python',
                 'Topic :: Scientific/Engineering',
                  ],
-    ext_modules = [Extension("stop_likelihoods", ["src/stop_likelihoods.pyx"])]
+    ext_modules = [Extension("stop_likelihoods", ["src/stop_likelihoods.pyx"], libraries=['gsl','gslcblas'])]
 )

@@ -59,13 +59,13 @@ def Go(value, imu_go, isigma_go, itau_go):
     assert isigma_go > 0
     assert itau_go > 0
     assert np.all(value != -999.)
-        
+
     pdf = np.sum(ExGauss_pdf(value, imu_go, isigma_go, itau_go))
     if np.isinf(pdf) or np.isnan(pdf):
         return -np.inf
     else:
         return pdf
-    
+
 def SRRT(value, issd, imu_go, isigma_go, itau_go, imu_stop, isigma_stop, itau_stop):
     """Censored ExGaussian log-likelihood of SRRTs"""
     assert imu_go > 0
@@ -75,7 +75,7 @@ def SRRT(value, issd, imu_go, isigma_go, itau_go, imu_stop, isigma_stop, itau_st
     assert isigma_stop > 0
     assert itau_stop > 0
     assert np.all(value != -999.)
-    
+
     pdf = np.sum(ExGauss_pdf(value, mu=imu_go, sigma=isigma_go, tau=itau_go)+ExGauss_cdf(value, mu=imu_stop+issd, sigma=isigma_stop, tau=itau_stop))
     if np.isinf(pdf) or np.isnan(pdf):
         return -np.inf
@@ -92,9 +92,9 @@ def Inhibitions(value, imu_go, isigma_go, itau_go, imu_stop, isigma_stop, itau_s
     assert imu_stop > 0
     assert isigma_stop > 0
     assert itau_stop > 0
-    
+
     def CExGauss_I(value, imu_go, isigma_go, itau_go, imu_stop, isigma_stop, itau_stop, issd):
-        pdf =np.exp(ExGauss_cdf(value, mu=imu_go, sigma=isigma_go, tau=itau_go))*np.exp(ExGauss_pdf(value, mu=imu_stop+issd, sigma=isigma_stop, tau=itau_stop))
+        pdf = np.exp(ExGauss_cdf(value, mu=imu_go, sigma=isigma_go, tau=itau_go))*np.exp(ExGauss_pdf(value, mu=imu_stop+issd, sigma=isigma_stop, tau=itau_stop))
         if np.isinf(pdf) or np.isnan(pdf):
             return -np.inf
         else:
@@ -156,7 +156,8 @@ class StopSignal(kabuki.Hierarchical):
                 return pm.Uniform(param.full_name, lower=1, upper=300)
 
             if param.name == 'Tau_go':
-                return pm.Uniform(param.full_name, lower=1, upper=300)
+                # CHANGED 300->2
+                return pm.Uniform(param.full_name, lower=1, upper=20) #300)
 
             if param.name == 'Mu_stop':
                 return pm.Uniform(param.full_name, lower=1, upper=600)
@@ -165,7 +166,7 @@ class StopSignal(kabuki.Hierarchical):
                 return pm.Uniform(param.full_name, lower=1, upper=250)
 
             if param.name == 'Tau_stop':
-                return pm.Uniform(param.full_name, lower=1, upper=250)
+                return pm.Uniform(param.full_name, lower=1, upper=20) #250)
 
     def get_var_node(self, param):
         if param.name == 'Mu_go':
@@ -187,7 +188,6 @@ class StopSignal(kabuki.Hierarchical):
             return pm.Uniform(param.full_name, lower=0.01, upper=100)
 
     def get_bottom_node(self, param, params):
-        print "get_bottom_node"
         if param.name == 'GoRT':
             data = param.data[param.data['ss_presented'] == 0]
             return Go_like(param.full_name,
@@ -198,7 +198,6 @@ class StopSignal(kabuki.Hierarchical):
                            observed=True)
 
         elif param.name == 'SRRT':
-            print "Creating SRRT"
             data = param.data[(param.data['ss_presented'] == 1) & (param.data['inhibited'] == 0)]
 
             return SRRT_like(param.full_name,
@@ -213,7 +212,6 @@ class StopSignal(kabuki.Hierarchical):
                              observed=True)
 
         elif param.name == 'Inhibitions':
-            print "Creating Inhibitions"
             data = param.data[(param.data['ss_presented'] == 1) & (param.data['inhibited'] == 1)]
             uniq_ssds = np.unique(data['ssd'])
             ssd_inhib_trials = []
