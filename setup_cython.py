@@ -11,6 +11,7 @@ if sys.platform == "win32":
     lib_gsl_dir = r"c:\Program Files\GnuWin32\lib"
 else:
     gsl_include = os.popen('gsl-config --cflags').read()[2:-1]
+    lib_gsl_dir = ''
 
 if gsl_include == '':
     print "Couldn't find gsl-config. Make sure it's installed and in the path."
@@ -30,7 +31,6 @@ setup(
     setup_requires=['NumPy >=1.3.0', 'kabuki >= 0.2a', 'pymc'],
     include_dirs = [np.get_include(), gsl_include],
     library_dirs=[lib_gsl_dir],
-    libraries=["gsl"],
     cmdclass = {'build_ext': build_ext},
     classifiers=[
                 'Development Status :: 3 - Alpha',
