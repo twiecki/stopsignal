@@ -30,6 +30,7 @@ setup(
     setup_requires=['NumPy >=1.3.0', 'kabuki >= 0.2a', 'pymc'],
     include_dirs = [np.get_include(), gsl_include],
     library_dirs=[lib_gsl_dir],
+    libraries=["gsl"],
     cmdclass = {'build_ext': build_ext},
     classifiers=[
                 'Development Status :: 3 - Alpha',
