@@ -17,14 +17,19 @@ from kabuki.hierarchical import Parameter
 
 import stop_likelihoods
 
-def ExGauss_pdf(value, mu, sigma, tau, logp=True):
+def ExGauss_pdf(value, mu, sigma, tau):
     """ ExGaussian log pdf"""
     z = value - mu - sigma*sigma/tau
     return -np.log(tau)-(z+(sigma*sigma/(2*tau)))/tau+np.log(norm.cdf(z/sigma))
 
-def ExGauss_cdf(value, mu, sigma, tau, logp=True):
+def ExGauss_cdf(value, mu, sigma, tau):
     """ ExGaussian log cdf upper tail"""
-    return np.log((1-(norm.cdf(((value-mu)/sigma))-np.exp(((sigma*sigma)/(2*(tau*tau)))-((value-mu)/tau))*norm.cdf(((value-mu)/sigma)-(sigma/tau)))))
+    exp_term = np.exp(((sigma**2)/(2*(tau**2)))-((value-mu)/tau))
+    cdf_2 = norm.cdf(((value-mu)/sigma)-(sigma/tau))
+    if sigma*.15 < tau or (exp_term == np.inf and cdf_2 == 0):
+        return np.log((1-(norm.cdf(((value-mu)/sigma)))))
+    else:
+        return np.log((1-(norm.cdf(((value-mu)/sigma)) - exp_term * cdf_2)))
 
 def cython_Go(value, imu_go, isigma_go, itau_go):
     """Ex-Gaussian log-likelihood of GoRTs"""
