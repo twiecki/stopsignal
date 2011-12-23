@@ -39,7 +39,7 @@ cdef inline double ExGauss_cdf(double value, double mu, double sigma, double tau
     """ ExGaussian log cdf upper tail"""
     cdef double exp_term = exp(((sigma**2)/(2*(tau**2)))-((value-mu)/tau))
     cdef double cdf_2 = gsl_cdf_gaussian_P(((value-mu)/sigma)-(sigma/tau), 1)
-    if sigma*.15 < tau or (exp_term == INFINITY and cdf_2 == 0):
+    if sigma*.05 > tau or (exp_term == INFINITY and cdf_2 == 0):
         return log((1-(gsl_cdf_gaussian_P(((value-mu)/sigma), 1))))
     else:
         return log((1-(gsl_cdf_gaussian_P(((value-mu)/sigma), 1) - exp_term * cdf_2)))
