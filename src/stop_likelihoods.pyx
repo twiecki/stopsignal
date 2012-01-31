@@ -18,7 +18,7 @@ from libc.math cimport log, exp, sqrt, pow
 cdef extern from "math.h":
     double INFINITY, NAN
 
-include "gsl/gsl.pxi"
+from cython_gsl cimport *
 
 ctypedef double * double_ptr
 ctypedef void * void_ptr
