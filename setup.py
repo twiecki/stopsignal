@@ -29,6 +29,6 @@ setup(
     ext_modules = [Extension("stop_likelihoods",
                              ["src/stop_likelihoods.pyx"],
                              libraries=['gsl','gslcblas'],
-                             library_dirs=cython_gsl.get_library_dir(),
-                             cython_include_dirs=cython_gsl.get_cython_include_dir())]
+                             library_dirs=[cython_gsl.get_library_dir()],
+                             cython_include_dirs=[cython_gsl.get_cython_include_dir()])]
 )
