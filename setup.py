@@ -1,6 +1,4 @@
-from distutils.core import setup
-from Cython.Distutils import Extension
-from Cython.Distutils import build_ext
+from distutils.core import setup, Extension
 import numpy as np
 import cython_gsl
 
@@ -14,9 +12,8 @@ setup(
     package_data={"stopsignal":["examples/*.csv"]},
     description="""stopsignal implements a hierarchical Bayesian estimation of the stopsignal model presented in Matzke et al (submitted) in kabuki.
     Matzke, D., Dolan, C.V, Logan, G.D., Brown, S.D., & Wagenmakers, E.-J. (submitted). Bayesian parametric estimation of stop-signal reaction time distributions. Manuscript submitted for publication.""",
-    setup_requires=['NumPy >=1.3.0', 'kabuki >= 0.2a', 'pymc', 'cython_gsl'],
+    setup_requires=['NumPy >=1.3.0', 'kabuki >= 0.2a', 'pymc'],
     include_dirs = [np.get_include(), cython_gsl.get_include()],
-    cmdclass = {'build_ext': build_ext},
     classifiers=[
                 'Development Status :: 3 - Alpha',
                 'Environment :: Console',
@@ -29,6 +26,5 @@ setup(
     ext_modules = [Extension("stop_likelihoods",
                              ["src/stop_likelihoods.pyx"],
                              libraries=['gsl','gslcblas'],
-                             library_dirs=[cython_gsl.get_library_dir()],
-                             cython_include_dirs=[cython_gsl.get_cython_include_dir()])]
+                             library_dirs=[cython_gsl.get_library_dir()])]
 )
