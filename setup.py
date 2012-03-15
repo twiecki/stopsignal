@@ -24,7 +24,7 @@ setup(
                 'Topic :: Scientific/Engineering',
                  ],
     ext_modules = [Extension("stop_likelihoods",
-                             ["src/stop_likelihoods.pyx"],
+                             ["src/stop_likelihoods.c"],
                              libraries=['gsl','gslcblas'],
                              library_dirs=[cython_gsl.get_library_dir()])]
 )
