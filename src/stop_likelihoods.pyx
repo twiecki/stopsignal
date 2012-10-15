@@ -32,17 +32,21 @@ cdef extern from "stdlib.h":
 cdef inline double ExGauss_pdf(double value, double mu, double sigma, double tau) nogil:
     """ ExGaussian log pdf"""
     cdef double z
-    z = value - mu - sigma**2/tau
-    return -log(tau) - (z+(sigma**2/(2*tau)))/tau + log( gsl_cdf_gaussian_P(z/sigma, 1) )
+    if tau > 0.05*sigma:
+        z = value - mu - ((sigma**2)/tau)
+        return -log(tau) - (z+(sigma**2/(2*tau)))/tau + log( gsl_cdf_gaussian_P(z/sigma, 1) )
+    else: 
+        return log(gsl_ran_gaussian_pdf(value-mu, sigma))
 
 cdef inline double ExGauss_cdf(double value, double mu, double sigma, double tau) nogil:
     """ ExGaussian log cdf upper tail"""
-    cdef double exp_term = exp(((sigma**2)/(2*(tau**2)))-((value-mu)/tau))
-    cdef double cdf_2 = gsl_cdf_gaussian_P(((value-mu)/sigma)-(sigma/tau), 1)
-    if sigma*.05 > tau or (exp_term == INFINITY and cdf_2 == 0):
-        return log((1-(gsl_cdf_gaussian_P(((value-mu)/sigma), 1))))
+    cdef double z
+    if tau > 0.05*sigma:
+        z = value - mu - ((sigma**2)/tau)
+        return log(1-(gsl_cdf_gaussian_P((value-mu)/sigma,1)-gsl_cdf_gaussian_P(z/sigma,1)*exp((((mu+((sigma**2)/tau))**2)-
+        (mu**2)-2*value *((sigma**2)/tau))/(2*(sigma**2)))))   
     else:
-        return log((1-(gsl_cdf_gaussian_P(((value-mu)/sigma), 1) - exp_term * cdf_2)))
+        return log((1-(gsl_cdf_gaussian_P(((value-mu)/sigma), 1))))
 
 def Go(np.ndarray[double, ndim=1] value, double imu_go, double isigma_go, double itau_go):
     """Ex-Gaussian log-likelihood of GoRTs"""
@@ -91,16 +95,6 @@ def SRRT(np.ndarray[double, ndim=1] value, np.ndarray[int, ndim=1] issd, double 
 
     return sum_logp
 
-
-def CExGauss_I(double value, double imu_go, double isigma_go, double itau_go, double imu_stop, double isigma_stop, double itau_stop, int issd):
-    cdef double pdf
-    pdf = exp(ExGauss_cdf(value, imu_go, isigma_go, itau_go)) * exp(ExGauss_pdf(value, imu_stop+issd, isigma_stop, itau_stop))
-
-    if np.isinf(pdf) or np.isnan(pdf):
-        return -np.inf
-    else:
-        return pdf
-
 def Inhibitions(np.ndarray[int, ndim=2] value, double imu_go, double isigma_go, double itau_go, double imu_stop, double isigma_stop, double itau_stop):
     """Censored ExGaussian log-likelihood of inhibitions"""
     assert imu_go > 0
@@ -126,13 +120,13 @@ def Inhibitions(np.ndarray[int, ndim=2] value, double imu_go, double isigma_go, 
         assert (ssd != -999)
 
         # Compute probability of single SSD
-        #p_ssd = log(quad(CExGauss_I, 0, 6000, args=(imu_go, isigma_go, itau_go, imu_stop, isigma_stop, itau_stop, ssd))[0])
         p_ssd = log(integrate_cexgauss(0, 6000, imu_go, isigma_go, itau_go, imu_stop, isigma_stop, itau_stop, ssd))
+        if np.isinf(p_ssd) or np.isnan(p_ssd):
+            return -np.inf
         # Multiply with number of trials and add to overall p
         sum_logp += n_trials * p_ssd
 
     return sum_logp
-
 
 ########################
 # Integration routines #

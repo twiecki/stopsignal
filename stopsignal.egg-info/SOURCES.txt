@@ -1,0 +1,10 @@
+setupegg.py
+src/stop_likelihoods.c
+src/stop_likelihoods.pyx
+stopsignal/__init__.py
+stopsignal/stopsignal.py
+stopsignal/stopsignal_2.py
+stopsignal.egg-info/PKG-INFO
+stopsignal.egg-info/SOURCES.txt
+stopsignal.egg-info/dependency_links.txt
+stopsignal.egg-info/top_level.txt
