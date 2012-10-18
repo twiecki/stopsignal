@@ -20,6 +20,14 @@ cdef extern from "math.h":
 
 from cython_gsl cimport *
 
+ctypedef double * double_ptr
+ctypedef void * void_ptr
+
+cdef extern from "stdlib.h":
+    void free(void* ptr)
+    void* malloc(size_t size)
+    void* realloc(void* ptr, size_t size)
+
 
 cdef inline double ExGauss_pdf(double value, double mu, double sigma, double tau) nogil:
     """ ExGaussian log pdf"""
