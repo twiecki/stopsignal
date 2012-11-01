@@ -73,32 +73,32 @@ class StopSignal(Hierarchical):
     def create_knodes(self):
 
         if self.is_group_model:
-            mu_go_mean = Knode(pm.TruncatedNormal, 'mu_go_mean', a=0, b=np.inf, mu=500, tau=0.0001)
+            mu_go_mean = Knode(pm.TruncatedNormal, 'mu_go_mean', a=0, b=np.inf, mu=500, tau=0.0001, depends=self.depends['mu_go'])
             mu_go_sd = Knode(pm.Uniform, 'mu_go_sd', lower=0.01, upper=300)
             mu_go_tau = Knode(pm.Deterministic, 'mu_go_tau', eval=lambda x: x**-2, x=mu_go_sd)
             mu_go_subj = Knode(pm.TruncatedNormal, 'mu_go_subj', a=0, b=np.inf, mu=mu_go_mean, tau=mu_go_tau, depends=('subj_idx',), subj=True)
 
-            sigma_go_mean = Knode(pm.TruncatedNormal, 'sigma_go_mean', a=0, b=np.inf, mu=100, tau=0.001)
+            sigma_go_mean = Knode(pm.TruncatedNormal, 'sigma_go_mean', a=0, b=np.inf, mu=100, tau=0.001, depends=self.depends['sigma_go'])
             sigma_go_sd = Knode(pm.Uniform, 'sigma_go_sd', lower=0.01, upper=200)
             sigma_go_tau = Knode(pm.Deterministic, 'sigma_go_tau', eval=lambda x: x**-2, x=sigma_go_sd)
             sigma_go_subj = Knode(pm.TruncatedNormal, 'sigma_go_subj', a=1, b=np.inf, mu=sigma_go_mean, tau=sigma_go_tau, depends=('subj_idx',), subj=True)
 
-            tau_go_mean = Knode(pm.TruncatedNormal, 'tau_go_mean', a=0, b=np.inf, mu=80, tau=0.001)
+            tau_go_mean = Knode(pm.TruncatedNormal, 'tau_go_mean', a=0, b=np.inf, mu=80, tau=0.001, depends=self.depends['tau_go'])
             tau_go_sd = Knode(pm.Uniform, 'tau_go_sd', lower=0.01, upper=200)
             tau_go_tau = Knode(pm.Deterministic, 'tau_go_tau', eval=lambda x: x**-2, x=tau_go_sd)
             tau_go_subj = Knode(pm.TruncatedNormal, 'tau_go_subj', a=1, b=np.inf, mu=tau_go_mean, tau=tau_go_tau, depends=('subj_idx',), subj=True)
 
-            mu_stop_mean = Knode(pm.TruncatedNormal, 'mu_stop_mean', a=0, b=np.inf, mu=200, tau=0.0001)
+            mu_stop_mean = Knode(pm.TruncatedNormal, 'mu_stop_mean', a=0, b=np.inf, mu=200, tau=0.0001, depends=self.depends['mu_stop'])
             mu_stop_sd = Knode(pm.Uniform, 'mu_stop_sd', lower=0.01, upper=200)
             mu_stop_tau = Knode(pm.Deterministic, 'mu_stop_tau', eval=lambda x: x**-2, x=mu_stop_sd)
             mu_stop_subj = Knode(pm.TruncatedNormal, 'mu_stop_subj', a=0, b=np.inf, mu=mu_stop_mean, tau=mu_stop_tau, depends=('subj_idx',), subj=True)
 
-            sigma_stop_mean = Knode(pm.TruncatedNormal, 'sigma_stop_mean', a=0, b=np.inf, mu=40, tau=0.001)
+            sigma_stop_mean = Knode(pm.TruncatedNormal, 'sigma_stop_mean', a=0, b=np.inf, mu=40, tau=0.001, depends=self.depends['sigma_stop'])
             sigma_stop_sd = Knode(pm.Uniform, 'sigma_stop_sd', lower=0.01, upper=100)
             sigma_stop_tau = Knode(pm.Deterministic, 'sigma_stop_tau', eval=lambda x: x**-2, x=sigma_stop_sd)
             sigma_stop_subj = Knode(pm.TruncatedNormal, 'sigma_stop_subj', a=1, b=np.inf, mu=sigma_stop_mean, tau=sigma_stop_tau, depends=('subj_idx',), subj=True)
 
-            tau_stop_mean = Knode(pm.TruncatedNormal, 'tau_stop_mean', a=0, b=np.inf, mu=30, tau=0.001)
+            tau_stop_mean = Knode(pm.TruncatedNormal, 'tau_stop_mean', a=0, b=np.inf, mu=30, tau=0.001, depends=self.depends['tau_stop'])
             tau_stop_sd = Knode(pm.Uniform, 'tau_stop_sd', lower=0.01, upper=100)
             tau_stop_tau = Knode(pm.Deterministic, 'tau_stop_tau', eval=lambda x: x**-2, x=tau_stop_sd)
             tau_stop_subj = Knode(pm.TruncatedNormal, 'tau_stop_subj', a=1, b=np.inf, mu=tau_stop_mean, tau=tau_stop_tau, depends=('subj_idx',), subj=True)
@@ -107,21 +107,21 @@ class StopSignal(Hierarchical):
             go_like = KnodeGo(Go_like, 'go_like', imu_go = mu_go_subj, isigma_go = sigma_go_subj, itau_go = tau_go_subj, col_name='rt', observed=True)
             srrt_like = KnodeSRRT(SRRT_like, 'srrt_like', imu_go = mu_go_subj, isigma_go = sigma_go_subj, itau_go = tau_go_subj, imu_stop = mu_stop_subj,isigma_stop = sigma_stop_subj, itau_stop = tau_stop_subj, col_name='rt', observed=True)
             inhibitions_like = KnodeInhibitions(Inhibitions_like, 'inhibitions_like', imu_go = mu_go_subj, isigma_go = sigma_go_subj, itau_go = tau_go_subj,imu_stop = mu_stop_subj, isigma_stop = sigma_stop_subj, itau_stop = tau_stop_subj, col_name='rt', observed=True)
-           
+
             return [mu_go_mean, mu_go_sd, mu_go_tau, mu_go_subj, sigma_go_mean, sigma_go_sd, sigma_go_tau, sigma_go_subj, tau_go_mean, tau_go_sd, tau_go_tau, tau_go_subj,
                     mu_stop_mean, mu_stop_sd, mu_stop_tau, mu_stop_subj, sigma_stop_mean, sigma_stop_sd, sigma_stop_tau, sigma_stop_subj, tau_stop_mean, tau_stop_sd, tau_stop_tau, tau_stop_subj,
                     go_like,srrt_like,inhibitions_like]
         else:
-            mu_go_subj = Knode(pm.Uniform, 'mu_go_subj', lower=0, upper=1000)
-            sigma_go_subj = Knode(pm.Uniform, 'sigma_go_subj', lower=1, upper=300)
-            tau_go_subj = Knode(pm.Uniform, 'tau_go_subj', lower=1, upper=300)
+            mu_go_subj = Knode(pm.Uniform, 'mu_go_subj', lower=0, upper=1000, depends=self.depends['mu_go'])
+            sigma_go_subj = Knode(pm.Uniform, 'sigma_go_subj', lower=1, upper=300, depends=self.depends['sigma_go'])
+            tau_go_subj = Knode(pm.Uniform, 'tau_go_subj', lower=1, upper=300, depends=self.depends['tau_go'])
 
-            mu_stop_subj = Knode(pm.Uniform, 'mu_stop_subj', lower=0,upper=600)
-            sigma_stop_subj = Knode(pm.Uniform, 'sigma_stop_subj', lower=1,upper=250)
-            tau_stop_subj = Knode(pm.Uniform, 'tau_stop_subj', lower=1,upper=250)
+            mu_stop_subj = Knode(pm.Uniform, 'mu_stop_subj', lower=0,upper=600, depends=self.depends['mu_stop'])
+            sigma_stop_subj = Knode(pm.Uniform, 'sigma_stop_subj', lower=1,upper=250, depends=self.depends['sigma_stop'])
+            tau_stop_subj = Knode(pm.Uniform, 'tau_stop_subj', lower=1,upper=250, depends=self.depends['tau_stop'])
 
             go_like = KnodeGo(Go_like, 'go_like', imu_go = mu_go_subj, isigma_go = sigma_go_subj, itau_go = tau_go_subj, col_name='rt', observed=True)
             srrt_like = KnodeSRRT(SRRT_like, 'srrt_like', imu_go = mu_go_subj, isigma_go = sigma_go_subj, itau_go = tau_go_subj, imu_stop = mu_stop_subj, isigma_stop = sigma_stop_subj, itau_stop = tau_stop_subj, col_name='rt', observed=True)
             inhibitions_like = KnodeInhibitions(Inhibitions_like, 'inhibitions_like', imu_go = mu_go_subj, isigma_go = sigma_go_subj, itau_go = tau_go_subj, imu_stop = mu_stop_subj, isigma_stop = sigma_stop_subj, itau_stop = tau_stop_subj, col_name='rt', observed=True)
-           
+
             return [mu_go_subj, sigma_go_subj, tau_go_subj, mu_stop_subj, sigma_stop_subj, tau_stop_subj, go_like, srrt_like, inhibitions_like]
