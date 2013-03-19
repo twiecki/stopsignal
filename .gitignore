@@ -4,3 +4,8 @@
 build/
 dist/
 docs/build
+Recovery
+RecoveryHier
+examples
+test
+stopsignal.egg-info

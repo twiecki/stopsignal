@@ -86,7 +86,7 @@ def SRRT(np.ndarray[double, ndim=1] value, np.ndarray[int, ndim=1] issd, double 
     cdef double sum_logp = 0
 
     for i in range(size):
-        p = ExGauss_pdf(value[i], imu_go, isigma_go, itau_go) + ExGauss_cdf(value[i], imu_stop+issd[i], isigma_stop, itau_stop)
+        p = ExGauss_pdf(value[i], imu_go, isigma_go, itau_go) + ExGauss_cdf(value[i]-issd[i], imu_stop, isigma_stop, itau_stop)
 
         if np.isinf(p) or np.isnan(p):
             return -np.inf
@@ -120,7 +120,7 @@ def Inhibitions(np.ndarray[int, ndim=2] value, double imu_go, double isigma_go, 
         assert (ssd != -999)
 
         # Compute probability of single SSD
-        p_ssd = log(integrate_cexgauss(0, 6000, imu_go, isigma_go, itau_go, imu_stop, isigma_stop, itau_stop, ssd))
+        p_ssd = log(integrate_cexgauss(0, 10000, imu_go, isigma_go, itau_go, imu_stop, isigma_stop, itau_stop, ssd))
         if np.isinf(p_ssd) or np.isnan(p_ssd):
             return -np.inf
         # Multiply with number of trials and add to overall p
@@ -142,7 +142,7 @@ cdef double eval_cexgauss(double x, void * params) nogil:
     itau_stop = (<double_ptr> params)[5]
     issd = (<double_ptr> params)[6]
 
-    p = exp(ExGauss_cdf(x, imu_go, isigma_go, itau_go)) * exp(ExGauss_pdf(x, imu_stop+issd, isigma_stop, itau_stop))
+    p = exp(ExGauss_cdf(x, imu_go, isigma_go, itau_go)) * exp(ExGauss_pdf(x-issd, imu_stop, isigma_stop, itau_stop))
 
     return p
 
