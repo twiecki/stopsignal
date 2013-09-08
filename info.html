@@ -1,0 +1,232 @@
+<html>
+<head>
+	<title>BEESTS</title>
+	<style>
+	
+h1,h2,h3,h4,h5 {
+	font-family: sans-serif ;
+	color: #c00;
+}
+
+a { 
+  color: #c00;
+  font-weight: 600;
+  text-decoration: none;
+}
+p {
+	font-family: sans-serif ;
+}
+
+.indent {
+margin-left: 2em;
+}
+
+.indent2 {
+margin-left: 4em;
+}
+
+.indent3 {
+margin-left: 6em;
+}
+	</style>
+</head>
+
+<body>
+
+
+<h1>BEESTs</h1>
+<h3>Version 1.1 (8/21/2013)</h3>
+
+<p><b>B</b>ayesian <b>E</b>x-Gaussian <b>E</b>stimation of <b>ST</b>op-<b>S</b>ignal RT distributions. 
+See Matzke, Dolan, Logan, Brown, & Wagenmakers (in press) and 
+Matzke, Love, Wiecki, Brown, Logan, & Wagenmakers (submitted) for details.</p>
+
+<p>BEESTS has been released under the GNU Affero General Public License. A copy of the GNU Affero General Public License
+is distributed along with BEESTS in AGPL_license.txt. Alternatively, see http://www.gnu.org/licenses/.<br/>
+Copyright (C) 2013  Dora Matzke (http://dora.erbe-matzke.com/)
+
+<h2>Table of contents</h2>
+<p>
+  <a href="#Data">Data</a><br/></u>
+    <a class="indent" href="#Individual analysis Data">Individual analysis</a><br/>
+    <a class="indent" href="#Hierarchical analysis Data">Hierarchical analysis</a><br/>
+  
+  <a href="#Analysis">Analysis</a><br/></u>
+    <a class="indent" href="#Sampling">Sampling</a><br/>
+      <a class="indent2" href="#Samples">Samples</a><br/>
+      <a class="indent2" href="#Burn-in">Burn-in</a><br/>
+      <a class="indent2" href="#Number of chains">Number of chains</a><br/>
+      <a class="indent2" href="#Thinning">Thinning</a><br/>
+    <a class="indent" href="#Output">Output</a><br/>
+      <a class="indent2" href="#Summary statistics">Summary statistics</a><br/>
+        <a class="indent3" href="#Individual analysis Summary">Individual analysis</a><br/>
+        <a class="indent3" href="#Hierarchical analysis Summary">Hierarchical analysis</a><br/>
+      <a class="indent2" href="#Posterior distributions">Posterior distributions </a><br/>
+         <a class="indent3" href="#Individual analysis Posterior">Individual analysis</a><br/>
+         <a class="indent3" href="#Hierarchical analysis Posterior">Hierarchical analysis</a><br/>
+      <a class="indent2" href="#MCMC chains">MCMC chains</a><br/>
+         <a class="indent3" href="#Individual analysis Chains">Individual analysis</a><br/>
+         <a class="indent3" href="#Hierarchical analysis Chains">Hierarchical analysis</a><br/>
+      <a class="indent2" href="#Deviance">Deviance</a><br/>
+      <a class="indent2" href="#Goodness-of-fit">Goodness-of-fit</a><br/>
+         <a class="indent3" href="#Individual analysis GOF">Individual analysis</a><br/>
+         <a class="indent3" href="#Hierarchical analysis GOF">Hierarchical analysis</a><br/>
+   <a class="indent" href="#Options">Options</a><br/>
+      <a class="indent2" href="#Max CPU">Max CPU cores to use</a><br/>
+  <a href="#Running">Running the analysis</a><br/>
+  <a href="#References">References</a><br/></u>
+</p>
+
+
+<h2><a name="Data"></a>Data</h2>
+
+<p>Data files should be saved as csv (i.e., comma--separated values) files. To load your data file, click on "Open" in the File menu in the upper left corner of the GUI. 
+This opens the "Open CSV File" window where you can load your data file by clicking on "Open" in the bottom right corner of the window.</p> 
+
+<h4><a name="Individual analysis Data"></a>Individual analysis</h4>
+
+<p>In data files for the individual analysis, the first row of the data file must contain the column names "ss_presented", "inhibited", "ssd", and "rt". Note that the column names 
+are case sensitive. The remaining rows contain the data for each go and stop-signal trial. The "ss_presented" column 
+contains the trial type, where go trials are coded with 0 and stop-signal trials are coded with 1. The "inhibited" column contains the inhibition data, where signal-respond trials 
+are coded with 0 (i.e., unsuccessful inhibition), signal-inhibit trials are coded with 1 (i.e., successful inhibition), and go trials are coded with -999. The column "ssd" contains 
+the stop-signal delay in ms., where go trials are coded with -999. The column "rt" contains the go RT for go trials and the signal-respond RT for signal-respond trials in ms., where 
+signal-inhibit trials are coded with -999. See the "examples" folder for an example of the data format suitable for the individual analysis ("example_data_ind.csv").</p>
+
+<h4><a name="Hierarchical analysis Data"></a>Hierarchical analysis</h4>
+
+<p>In data files for the hierarchical analysis, the first row of the data file must contain the column names "subj_idx", "ss_presented", "inhibited", "ssd", and "rt". Note that the column names 
+are case sensitive. The remaining rows contain the data for the go and stop-signal trials for each participant. The "subj_idx" column contains the participant number. The "ss_presented" column 
+contains the trial type, where go trials are coded with 0 and stop-signal trials are coded with 1. The "inhibited" column contains the inhibition data, where signal-respond trials 
+are coded with 0 (i.e., unsuccessful inhibition), signal-inhibit trials are coded with 1 (i.e., successful inhibition), and go trials are coded with -999. The column "ssd" contains 
+the stop-signal delay in ms., where go trials are coded with -999. The column "rt" contains the go RT for go trials and the signal-respond RT for signal-respond trials in ms., where 
+signal-inhibit trials are coded with -999. See the "examples" folder for an example of the data format suitable for the hierarchical analysis ("example_data_group.csv").</p>
+
+<h2><a name="Analysis"></a>Analysis</h2>
+
+<h3><a name="Sampling"></a>Sampling</h3>
+
+<h4><a name="Number of chains"></a>Number of chains</h4>
+<p>The number of MCMC chains, i.e., sequences of values sampled from the posterior distribution of the parameters. 
+The start values are automatically set to the maximum a posteriori probability (MAP) estimates of the model parameters. Note that the computation of the Gelman-Rubin Rhat convergence diagnostic requires
+multiple chains.</p>
+
+<h4><a name="Samples"></a>Samples</h4>
+<p>The total number of MCMC samples per chain. The total number of MCMC samples must be greater than 0.
+The number of retained samples per chain equals (Samples - Burn-in)/Thinning. For computational stability, make sure to retian an integer number of samples.</p>
+
+<h4><a name="Burn-in"></a>Burn-in</h4>
+<p>The number of burn-in samples to discard at the beginning of each chain.
+The number of burn-in samples must be smaller than the total number of MCMC samples.</p>
+
+<h4><a name="Thinning"></a>Thinning</h4>
+<p>Degree of thinning within each chain, e.g., a thinning factor of 12 means that only every 12th MCMC sample will be retained.</p>
+
+<h3><a name="Output"></a>Output</h3>
+
+<h4><a name="Summary statistics"></a>Summary statistics</h4>
+<p>Produces a csv file with the summary statistics (i.e., mean, standard deviation, and quantiles) of the posterior distribution of the model parameters.</p>
+
+<h5><a name="Individual analysis Summary"></a>Individual analysis</h5>
+<p>"Summary statistics" produces a csv file with the summary statistics of the six individual model parameters and of the corresponding mean and standard deviation 
+of the go and SSRT distribution.<br></br>
+Output: name.datafile_individual_summary.csv</p>
+
+<h5><a name="Hierarchical analysis Summary"></a>Hierarchical analysis</h5>
+<p>If output for "Group only" is selected, "Summary statistics" produces a single csv file with the summary statistics of the twelve group-level 
+parameters. <br></br>
+If output for "All" is selected, "Summary statistics" produces one csv file with the summary statistics of the twelve group-level 
+parameters and separate csv files for each participant with the six individual model parameters and the corresponding mean and standard deviation 
+of the go and SSRT distribution.<br></br>
+Output: name.datafile_group_parameter_summary.csv and name.datafile_individual.summary.csv for each participant</p>
+
+<h4><a name="Posterior distributions"></a>Posterior distributions</h4>
+<p>Produces density plots of the posterior distribution of the model parameters.<br></br>
+
+<h5><a name="Individual analysis Posterior"></a>Individual analysis</h5>
+<p>"Posterior distributions" produces a pdf file with density plots of the posterior (black line) and prior distribution (gray line) for the six individual model parameters. <br></br>
+Output: name.datafile_individual_posteriors.pdf</p>
+
+<h5><a name="Hierarchical analysis Posterior"></a>Hierarchical analysis</h5>
+<p>If output for "Group only" is selected, "Posterior distributions" produces a pdf file with density plots of the posterior (black line) and prior distribution (gray line) for the twelve group-level parameters. <br></br>
+If output for "All" is selected, "Posterior distributions" produces one pdf file with density plots of the posterior (black line) and prior distribution (gray line) for the twelve group-level parameters and
+separate pdf files for each participant containing the density plots for of the posterior distribution of the six individual model parameters.<br></br>
+Output: name.datafile_group_parameter_posteriors.csv and name.datafile_individual_posteriors.csv for each participant</p>
+
+<h4><a name="MCMC chains"></a>MCMC chains</h4>
+<p>Produces trace plots for the MCMC chains of the model parameters.</p>
+
+<h5><a name="Individual analysis Chains"></a>Individual analysis</h5>
+<p>"MCMC chains" produces a pdf file with trace plots for the six individual model 
+parameters.<br></br>
+Output: name.datafile_individual_chains.pdf</p>
+
+<h5><a name="Hierarchical analysis Chains"></a>Hierarchical analysis</h5>
+<p>If output for "Group only" is selected, "MCMC chains" produces a pdf file with trace plots for the twelve group-level parameters.<br></br>
+If output for "All" is selected, "MCMC chains" produces one pdf file with trace plots for the twelve group-level parameters and
+separate pdf files for each participant containing the trace plots for the six individual model parameters.<br></br>
+Output: name.datafile_group_parameter_chains.csv and name.datafile_individual_chains.csv for each participant</p>
+
+<h4><a name="Deviance"></a>Deviance</h4>
+<p>Saves the deviance values from each chain in a separate csv file.<br></br> 
+Output: name.datafile_deviance.csv</p>
+
+<h4><a name="Goodness-of-fit"></a>Goodness-of-fit</h4>
+<p>
+Assesses the absolute goodness-of-fit of the model using posterior predictive model checks.<br></br>
+
+we assess the adequacy of the model by generating predicted data using the posterior distributions of the parameters. 
+If the model adequately describes the data, the predictions based on the model parameters should closely approximate the observed data. 
+The model checks can be formalized by computing posterior predictive p values (e.g., Gelman & Hill, 2007; Gelman et al., 1996). 
+Extreme p values close to 0 or 1 indicate that the BPA does not describe the observed data adequately.<br></br>
+
+For each individual participant, BEESTS uses the median of the observed and predicted signal-respond RTs as test statistic. 
+The "Predictions" option can be used to specify the number of predicted data sets. 
+BEESTS then randomly samples the specified number of parameter vectors from the joint posterior of the individual go and stop parameters. 
+Next, BEESTS generates the specified number of predicted stop-signal data sets for each SSD using the corresponding number of stop-signal trials 
+and the chosen parameter vectors. For each predicted data set, BEESTS then computes the median signal-respond RT per SSD. 
+Lastly, for each SSD, BEESTS  computes the one-sided posterior predictive p value given by the fraction of times that the predicted median signal-respond RT 
+is greater than the observed median signal-respond RT. Corresponding two-sided p values can be computed as 2 x min(p, 1 - p). 
+Note however that two-sided p values are well defined only when the test statistic has a symmetric distribution. Note also that BEESTS assesses model predictions 
+on all SSDs with at least one observed signal-respond RT. In order to obtain stable median signal-respond RTs, however, we advise users to assess model fit only 
+at SSDs with a reasonable number of observed signal-respond RTs.
+<br></br>
+
+<h5><a name="Individual analysis GOF"></a>Individual analysis</h5>
+<p>"Goodness-of-fit" produces (1) a csv file listing for each SSD the number of observed signal-respond RTs, the observed median SRRT, 
+the average of the predicted median signal-respond RTs, and the one-sided and two-sided posterior predictive p value, and (2) a pdf file with a 
+graphical summary of the model checks. For each SSD, the resulting figure shows the observed median signal-respond RTs (black triangle), 
+a density plot of the predicted median signal-respond RTs (gray violin plot), a boxplot ranging from the 25th to the 75th percentile of the
+predicted median signal-respond RTs, and the median of the predicted median signal-respond RTs (white circle).<br></br>
+Output: name.datafile_summary_posterior_predictions.csv and name.datafile_posterior_predictions.pdf</p>
+
+<h5><a name="Hierarchical analysis GOF"></a>Hierarchical analysis</h5>
+<p>The posterior predictive models check are performed seperatley for each participant using the posterior distribution of the
+individual go and stop parameters. See individual analysis for details.</p>
+
+<h2><a name="Options"></a>Options</h2>
+
+<h3><a name="Max CPU"></a>Max CPU cores to use</h3>
+<p>Specifies the number of CPU cores to use during the sampling process. 
+If multiple MCMC chains are requested, BEESTS will run the chains in parallel by allocating each chain to different CPU core in order to increase efficiency. 
+The default number of CPU cores used by BEESTS is the number of cores available on the computer at hand minus one.</p>
+
+<h2><a name="Running"></a>Running the analysis</h2>
+
+<p>Start the analysis by clicking on "Run". BEESTS automatically displays the progress of the sampling. 
+If multiple MCMC chains are run in parallel, BEESTS displays the progress of only one of the MCMC chains (i.e., the main process). 
+The analysis can be stopped by "killing" the (parallel) processes in the Task Manager. Use the "Clear" command to clear the working space.</p>
+
+
+<h2><a name="References"></a>References</h2>
+
+<p>
+Gelman, A., & Hill, J. (2007). <em>Data analysis using regression and multilevel/hierarchical models</em>. Cambridge: Cambridge University Press.<br></br>
+Gelman, A., Meng, X., & Stern, H. (1996). Posterior predictive assessment of model fitness via realized discrepancies. <em>Statistica Sinica, 6</em> , 733-807.<br></br>
+Matzke, D., Dolan, C.V, Logan, G.D., Brown, S.D., &  Wagenmakers, E.-J. (in press). Bayesian parametric estimation of stop-signal reaction time distributions. <em>Journal of Experimental Psychology: General.</em><br></br>
+Matzke, D., Love. J., Wiecki, T., Brown, S.D., Logan, G.D., &  Wagenmakers, E.-J. (submitted). Release the BEESTS: Software package for the Bayesian estimation of stop-signal reaction time distributions.<p/>
+
+
+
+
+</body>
+</html>

@@ -1,1 +1,0 @@
-python setupegg.py develop
