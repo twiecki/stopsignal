@@ -35,7 +35,7 @@ margin-left: 6em;
 
 
 <h1>BEESTs</h1>
-<h3>Version 1.1 (8/21/2013)</h3>
+<h3>Version 1.2 (9/17/2013)</h3>
 
 <p><b>B</b>ayesian <b>E</b>x-Gaussian <b>E</b>stimation of <b>ST</b>op-<b>S</b>ignal RT distributions. 
 See Matzke, Dolan, Logan, Brown, & Wagenmakers (in press) and 
@@ -50,7 +50,7 @@ Copyright (C) 2013  Dora Matzke (http://dora.erbe-matzke.com/)
   <a href="#Data">Data</a><br/></u>
     <a class="indent" href="#Individual analysis Data">Individual analysis</a><br/>
     <a class="indent" href="#Hierarchical analysis Data">Hierarchical analysis</a><br/>
-  
+    <a class="indent" href="# notes on data">Furhter instructions and recommendations</a><br/>
   <a href="#Analysis">Analysis</a><br/></u>
     <a class="indent" href="#Sampling">Sampling</a><br/>
       <a class="indent2" href="#Samples">Samples</a><br/>
@@ -90,7 +90,7 @@ are case sensitive. The remaining rows contain the data for each go and stop-sig
 contains the trial type, where go trials are coded with 0 and stop-signal trials are coded with 1. The "inhibited" column contains the inhibition data, where signal-respond trials 
 are coded with 0 (i.e., unsuccessful inhibition), signal-inhibit trials are coded with 1 (i.e., successful inhibition), and go trials are coded with -999. The column "ssd" contains 
 the stop-signal delay in ms., where go trials are coded with -999. The column "rt" contains the go RT for go trials and the signal-respond RT for signal-respond trials in ms., where 
-signal-inhibit trials are coded with -999. See the "examples" folder for an example of the data format suitable for the individual analysis ("example_data_ind.csv").</p>
+signal-inhibit trials are coded with -999. See the "examples" folder for a toy data set suitable for the individual analysis ("example_data_ind.csv").</p>
 
 <h4><a name="Hierarchical analysis Data"></a>Hierarchical analysis</h4>
 
@@ -99,7 +99,18 @@ are case sensitive. The remaining rows contain the data for the go and stop-sign
 contains the trial type, where go trials are coded with 0 and stop-signal trials are coded with 1. The "inhibited" column contains the inhibition data, where signal-respond trials 
 are coded with 0 (i.e., unsuccessful inhibition), signal-inhibit trials are coded with 1 (i.e., successful inhibition), and go trials are coded with -999. The column "ssd" contains 
 the stop-signal delay in ms., where go trials are coded with -999. The column "rt" contains the go RT for go trials and the signal-respond RT for signal-respond trials in ms., where 
-signal-inhibit trials are coded with -999. See the "examples" folder for an example of the data format suitable for the hierarchical analysis ("example_data_group.csv").</p>
+signal-inhibit trials are coded with -999. See the "examples" folder for a toy data set suitable for the hierarchical analysis ("example_data_group.csv").</p>
+
+<h4><a name="notes on data"></a>Furhter instructions and recommendations</h4>
+
+<p>The present version of BEESTS cannot handle missing values for go RTs and signal-respond RTs. For example, the following response patterns are not allowed: "ss_presented" = 0, "inhibited" = -999, "ssd" = -999, and "rt" = -999
+(i.e., missing value on a go trial) and "ss_presented" = 1, "inhibited" = 0, "ssd" = 150, and "rt" = -999 (missing value on a signal-respond trial).</p>
+
+<p>BEESTS requires the data of each participant to feature at least one go RT, one signal-respond RT, and one succesfull inhibition.
+
+<p>BEESTS requires participant numbers in the "subj_idx" column of hiearchical data sets to range from 1 to the number of participants in the data set in steps of one.</p>
+
+<p>The ex-Gaussian distribution is sensitive to outlier response times. Users are therfore advised to eliminate outliers before the BEESTS analysis.</p>
 
 <h2><a name="Analysis"></a>Analysis</h2>
 
@@ -215,6 +226,14 @@ The default number of CPU cores used by BEESTS is the number of cores available 
 <p>Start the analysis by clicking on "Run". BEESTS automatically displays the progress of the sampling. 
 If multiple MCMC chains are run in parallel, BEESTS displays the progress of only one of the MCMC chains (i.e., the main process). 
 The analysis can be stopped by "killing" the (parallel) processes in the Task Manager. Use the "Clear" command to clear the working space.</p>
+
+<h2><a name="Running"></a>Troubleshooting tips</h2>
+
+<p>In case of convergence problems, try to increase the number of samples, the length of the burn-in period and the degree of thinning.</p>
+
+<p>If BEESTS crashes before the sampling process begins, check the data set and make sure that your response coding follows the instructions listed above.
+
+<p>In hierarchical analysis, start debugging by sequentially adding the data of the individual participants.
 
 
 <h2><a name="References"></a>References</h2>

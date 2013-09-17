@@ -13,7 +13,6 @@ except:
     def debug_here(): pass
 
 from kabuki import Hierarchical, Knode
-from kabuki.utils import stochastic_from_dist
 import stop_likelihoods
 from collections import OrderedDict
 
@@ -29,15 +28,20 @@ def cython_Inhibitions(value, imu_go, isigma_go, itau_go, imu_stop, isigma_stop,
     """Censored ExGaussian log-likelihood of inhibitions"""
     return stop_likelihoods.Inhibitions(value, imu_go, isigma_go, itau_go, imu_stop, isigma_stop, itau_stop)
 
-Go_like = stochastic_from_dist(name="Ex-Gauss GoRT",
-                               logp=cython_Go)
+Go_like = pm.stochastic_from_dist(name="Ex-Gauss GoRT",
+                                  logp=cython_Go,
+                                  dtype=np.float,
+                                  mv=False)
 
-SRRT_like = stochastic_from_dist(name="CensoredEx-Gauss SRRT",
-                                 logp=cython_SRRT)
+SRRT_like = pm.stochastic_from_dist(name="CensoredEx-Gauss SRRT",
+                                    logp=cython_SRRT,
+                                    dtype=np.float,
+                                    mv=False)
 
-Inhibitions_like = stochastic_from_dist(name="CensoredEx-Gauss Inhibittions",
-                                        logp=cython_Inhibitions)
-
+Inhibitions_like = pm.stochastic_from_dist(name="CensoredEx-Gauss Inhibittions",
+                                  logp=cython_Inhibitions,
+                                  dtype=np.int32,
+                                  mv=False)
 class KnodeGo(Knode):
     def create_node(self, node_name, kwargs, data):
         new_data = data[data['ss_presented'] == 0]
@@ -68,45 +72,6 @@ class StopSignal(Hierarchical):
         self.group_only_nodes = kwargs.pop('group_only_nodes', ())
         super(StopSignal, self).__init__(data, **kwargs)
 
-
-    def _create_family_trunc_normal(self, name, value=0, lower=None,
-                                   upper=None, std_lower=1e-10,
-                                   std_upper=100, std_value=.1):
-        """Similar to _create_family_normal() but creates a Uniform
-        group distribution and a truncated subject distribution.
-
-        See _create_family_normal() help for more information.
-
-        """
-        knodes = OrderedDict()
-
-        if self.is_group_model and name not in self.group_only_nodes:
-            g = Knode(pm.Uniform, '%s' % name, lower=lower,
-                      upper=upper, value=value, depends=self.depends[name])
-
-            depends_std = self.depends[name] if self.std_depends else ()
-            std = Knode(pm.Uniform, '%s_std' % name, lower=std_lower,
-                        upper=std_upper, value=std_value, depends=depends_std)
-            tau = Knode(pm.Deterministic, '%s_tau' % name,
-                        doc='%s_tau' % name, eval=lambda x: x**-2, x=std,
-                        plot=False, trace=False, hidden=True)
-            subj = Knode(pm.TruncatedNormal, '%s_subj' % name, mu=g,
-                         tau=tau, a=lower, b=upper, value=value,
-                         depends=('subj_idx',), subj=True, plot=self.plot_subjs)
-
-            knodes['%s'%name] = g
-            knodes['%s_std'%name] = std
-            knodes['%s_tau'%name] = tau
-            knodes['%s_bottom'%name] = subj
-
-        else:
-            subj = Knode(pm.Uniform, name, lower=lower,
-                         upper=upper, value=value,
-                         depends=self.depends[name])
-            knodes['%s_bottom'%name] = subj
-
-        return knodes
-
     def create_ss_knode(self, knodes):
         ss_parents = OrderedDict()
         ss_parents['imu_go'] = knodes['mu_go_bottom']
@@ -124,13 +89,14 @@ class StopSignal(Hierarchical):
 
     def create_knodes(self):
         knodes = OrderedDict()
-        knodes.update(self._create_family_trunc_normal('mu_go', lower=1e-3, upper=1e3, value=400, std_lower=0.01, std_upper=300, std_value=50))
-        knodes.update(self._create_family_trunc_normal('sigma_go', lower=1, upper=500, value=50, std_lower=0.01, std_upper=200, std_value=20))
-        knodes.update(self._create_family_trunc_normal('tau_go', lower=1, upper=500, value=50, std_lower=0.01, std_upper=200, std_value=20))
-        knodes.update(self._create_family_trunc_normal('mu_stop', lower=1e-3, upper=600, value=200, std_lower=0.01, std_upper=300, std_value=40))
-        knodes.update(self._create_family_trunc_normal('sigma_stop', lower=1, upper=350, value=30, std_lower=0.01, std_upper=200, std_value=20))
-        knodes.update(self._create_family_trunc_normal('tau_stop', lower=1, upper=350, value=30, std_lower=0.01, std_upper=200, std_value=20))
-
+        knodes.update(self.create_family_trunc_normal('mu_go', lower=1e-3, upper=1e3, value=400,var_lower=0.01, var_upper=300, var_value=50))
+        knodes.update(self.create_family_trunc_normal('sigma_go', lower=1, upper=500, value=50,var_lower=0.01, var_upper=200, var_value=20))
+        knodes.update(self.create_family_trunc_normal('tau_go', lower=1, upper=500, value=50,var_lower=0.01, var_upper=200, var_value=20))
+        knodes.update(self.create_family_trunc_normal('mu_stop', lower=1e-3, upper=600, value=200,var_lower=0.01, var_upper=300, var_value=40))
+        knodes.update(self.create_family_trunc_normal('sigma_stop', lower=1, upper=350, value=30,var_lower=0.01, var_upper=200, var_value=20))
+        knodes.update(self.create_family_trunc_normal('tau_stop', lower=1, upper=350, value=30,var_lower=0.01, var_upper=200, var_value=20))
+        
         likelihoods = self.create_ss_knode(knodes)
-
+      
         return knodes.values() + likelihoods
+
