@@ -70,6 +70,8 @@ class StopSignal(Hierarchical):
 
     def __init__(self, data, **kwargs):
         self.group_only_nodes = kwargs.pop('group_only_nodes', ())
+        self.std_depends = kwargs.get('std_depends', False)
+
         super(StopSignal, self).__init__(data, **kwargs)
 
     def create_ss_knode(self, knodes):
